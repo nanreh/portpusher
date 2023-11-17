@@ -102,11 +102,11 @@ func loop(logger logging.Logger, gtc *gluetun.Client, pushers []PortPusher, dela
 				}
 			}
 			if isError {
-				logger.Info("Done. Next push attemptin %v.", delaySuccess)
-				time.Sleep(delaySuccess)
-			} else {
-				logger.Info("Done. Next push in %v.", delayError)
+				logger.Info("Done. Next push attempt in %v.", delayError)
 				time.Sleep(delayError)
+			} else {
+				logger.Info("Done. Next push in %v.", delaySuccess)
+				time.Sleep(delaySuccess)
 			}
 		}
 	}
