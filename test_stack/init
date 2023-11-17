@@ -1,0 +1,6 @@
+#/usr/bin/bash
+
+# create the minimum set of directories required for our test containers to start
+mkdir -p run/deluge/{conf,downloads}
+mkdir -p run/qbittorrent/{conf,downloads}
+mkdir -p run/transmission/{conf,downloads}

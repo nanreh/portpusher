@@ -1,0 +1,98 @@
+version: "3.3"
+name: test_stack
+services:
+  vpn:
+    image: qmcgaw/gluetun
+    container_name: vpn
+    restart: unless-stopped
+    labels:
+      - autoheal=true
+    networks:
+      - vpn
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - VPN_SERVICE_PROVIDER=private internet access
+      - OPENVPN_USER=secret
+      - OPENVPN_PASSWORD=secret
+      - SERVER_REGIONS=Netherlands
+      - VPN_PORT_FORWARDING=on
+    ports:
+      - "8112:8112/tcp" # deluge web ui (default admin/deluge)
+      - "9091:9091/tcp" # transmission web ui (default admin/password)
+      - "8080:8080/tcp" # qbittorrent web ui (default: admin/adminadmin)
+  deluge:
+    # The admin interface is available at http://SERVER-IP:8112 with a default user/password of admin/deluge.
+    image: lscr.io/linuxserver/deluge:latest
+    container_name: deluge
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - ./run/deluge/conf:/config
+      - ./run/deluge/downloads:/downloads
+    network_mode: "service:vpn" # Force VPN
+    restart: unless-stopped
+    labels:
+      - autoheal=true
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "google.com"]
+      interval: 5m
+      retries: 2
+      start_period: 20s
+      timeout: 10s
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - TZ=America/Los_Angeles
+      - USER=admin
+      - PASS=password
+    volumes:
+      - ./run/transmission/conf:/config
+      - ./run/transmission/downloads:/downloads
+    network_mode: "service:vpn" # Force VPN
+    restart: unless-stopped
+    labels:
+      - autoheal=true
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "google.com"]
+      interval: 5m 
+      retries: 2
+      start_period: 20s
+      timeout: 10s
+  qbittorrent:
+    # The webui is at <your-ip>:8080 and the default username/password is admin/adminadmin.
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - ./run/qbittorrent/conf:/config
+      - ./run/qbittorrent/downloads:/downloads
+    network_mode: "service:vpn" # Force VPN
+    restart: unless-stopped
+    labels:
+      - autoheal=true
+    healthcheck:
+      test: ["CMD", "ping", "-c", "1", "google.com"]
+      interval: 5m
+      retries: 2
+      start_period: 20s
+      timeout: 10s
+  autoheal:
+    image: willfarrell/autoheal:1.2.0
+    container_name: autohealer
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+  portpusher:
+    image: nanreh/portpusher:latest
+    container_name: portpusher
+    network_mode: "service:vpn"
+    environment:
+      - TRANSMISSION_ENABLED=true
+      - QBITTORRENT_ENABLED=true
+      - DELUGE_ENABLED=true
+networks:
+  vpn:
+    name: vpn
