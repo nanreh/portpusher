@@ -3,7 +3,7 @@
 # PortPusher
 PortPusher is a tiny program in a tiny Docker image that keeps your [Bittorrent](https://en.wikipedia.org/wiki/BitTorrent) client(s) updated with the forwarded port from your [Gluetun](https://github.com/qdm12/gluetun) VPN session. It's the perfect companion container for your homelab/seedbox.
 
-Every few minutes, PortPusher check Gluetun for the current forwarded port and will "push" it to your Bittorrent client, if necessary.
+Every few minutes, PortPusher checks Gluetun for the current forwarded port and "pushes" it to your Bittorrent client.
 
 Supported BitTorrent clients:
 * [Transmission](https://transmissionbt.com/)
@@ -94,7 +94,7 @@ The architectures supported by this image are `amd64` and `arm64`.
 
 When you're online, your public IP address is provided by your Internet service provider and assigned to some piece of hardware in your hand or in your home. Most of your online activity involves making requests to fetch content from other IP addresses, like when you fetch a web page or play a song on Spotify. To make such a request, you also need to specify a port number.
 
-The defining feature of peer-to-peer systems like Bittorrent is that every peer in a "swarm" be able to make request directly to other peers. If one peer needs a chunk of data that another peer has it simply makes a request to that peer and requests the data. Here again, making a request requires both the peer's IP address and a port number.
+The defining feature of peer-to-peer systems like Bittorrent is that every peer in a "swarm" can send a request directly to any other peer. If one peer needs a chunk of data that another peer has, it simply makes a request to that peer and requests the data. Here again, making a request requires both the peer's IP address and a port number.
 
 Your Bittorrent software needs to know the IP address and port number where it can be reached so it can share it with other peers. 
 
